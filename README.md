@@ -4,6 +4,14 @@ Recolor the animated macOS Tahoe wallpaper without the banding and jagged edges 
 
 Needs macOS 26 with a Tahoe Landscape or Portrait wallpaper selected, Swift (Xcode or the Command Line Tools), and ffmpeg with libx265 (`brew install ffmpeg`). No Apple wallpaper files are included; the script works on the copies already on your Mac.
 
+| | |
+| --- | --- |
+| ![Dark Landscape, original](docs/dark-original.jpg) Dark, original | ![Dark Landscape, #5755d9](docs/dark-indigo.jpg) `#5755d9` |
+| ![Dark Landscape, mono](docs/dark-mono.jpg) `#808080` | ![Dark Landscape, hue rotated 120 degrees](docs/dark-hue120.jpg) `120` |
+| ![Light Landscape, original](docs/light-original.jpg) Light, original | ![Light Landscape, #f7be1c](docs/light-f7be1c.jpg) `#f7be1c` |
+
+All frames are from the same moment of the video. The `120` example is a single frame recolored through `recolor.swift`; the others are from full renders.
+
 ## Quick start
 
 ```bash
