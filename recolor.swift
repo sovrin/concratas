@@ -10,9 +10,13 @@ let args = CommandLine.arguments
 let hexArg = args.count >= 4 && args[1].hasPrefix("#") ? Int(args[1].dropFirst(), radix: 16) : nil
 let pivot = args.count == 5 ? Double(args[4]) : 0.5
 guard args.count == 4 || args.count == 5, hexArg != nil || Double(args[1]) != nil, let pivot, pivot > 0, pivot < 1 else {
-    print("usage: swift recolor.swift <degrees | #rrggbb> <input> <output> [pivot 0..1]"); exit(1)
+    // stderr: with output "-" stdout is the video pipe
+    FileHandle.standardError.write("usage: swift recolor.swift <degrees | #rrggbb> <input> <output> [pivot 0..1]\n".data(using: .utf8)!); exit(1)
 }
 let input = URL(fileURLWithPath: args[2]), output = URL(fileURLWithPath: args[3])
+// The output is deleted before the input is read; compare file identity so symlinks and case differences count as the same file.
+let fileID = { (u: URL) in (try? u.resolvingSymlinksInPath().resourceValues(forKeys: [.fileResourceIdentifierKey]))?.fileResourceIdentifier as? NSObject }
+if let id = fileID(input), id == fileID(output) { print("output is the same file as the input, refusing to overwrite it"); exit(1) }
 let angle = (Double(args[1]) ?? 0) * .pi / 180
 
 // CIHueAdjust pushes 66-97% of this very saturated blue out of gamut; the clipping shows up as jagged contours.
