@@ -5,10 +5,13 @@ import AVFoundation
 
 let args = CommandLine.arguments
 guard args.count == 3 else { print("usage: swift remux.swift <input.mov> <output.mov>"); exit(1) }
-let output = URL(fileURLWithPath: args[2])
+let source = URL(fileURLWithPath: args[1]), output = URL(fileURLWithPath: args[2])
+// The output is deleted before the input is read; compare file identity so symlinks and case differences count as the same file.
+let fileID = { (u: URL) in (try? u.resolvingSymlinksInPath().resourceValues(forKeys: [.fileResourceIdentifierKey]))?.fileResourceIdentifier as? NSObject }
+if let id = fileID(source), id == fileID(output) { print("output is the same file as the input, refusing to overwrite it"); exit(1) }
 try? FileManager.default.removeItem(at: output)
 
-let asset = AVURLAsset(url: URL(fileURLWithPath: args[1]))
+let asset = AVURLAsset(url: source)
 let track = try await asset.loadTracks(withMediaType: .video)[0]
 let reader = try AVAssetReader(asset: asset)
 let out = AVAssetReaderTrackOutput(track: track, outputSettings: nil)
